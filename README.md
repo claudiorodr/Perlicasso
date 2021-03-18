@@ -2,7 +2,8 @@
 
 What would happen if Picasso painted with perlin noise? This is the answer. We developed a Perlin noise python algorithm for image generation and a Twitter bot that posts a generated image everyday.
 
-![alt text](https://github.com/claudiorodr/Perlicasso/blob/master/generatedMap.png)
+![alt text](https://github.com/claudiorodr/Perlicasso/blob/master/assets/generatedMap.png)
+![alt text](https://github.com/claudiorodr/Perlicasso/blob/master/assets/Twitter.png)
 
 ---
 ## Requirements
