@@ -1,12 +1,13 @@
 # Perlicasso
 
-What would happen if Picasso painted with perlin noise? This is the answer. We developed a Perlin noise algorithm for image generation and a Twitter bot that posts a generated image everyday.
+What would happen if Picasso painted with perlin noise? This is the answer. We developed a Perlin noise python algorithm for image generation and a Twitter bot that posts a generated image everyday.
+
 ![alt text](https://github.com/claudiorodr/Perlicasso/blob/master/generatedMap.png)
 
 ---
 ## Requirements
 
-For development, you will only need Node.js and a node global package, Yarn, installed in your environement.
+For development, you will only need Node.js and a node global package, Yarn, installed in your environnement.
 
 ### Node
 - #### Node installation on Windows
@@ -46,8 +47,8 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
 ## Install
 
-    $ git clone https://github.com/YOUR_USERNAME/PROJECT_TITLE
-    $ cd PROJECT_TITLE
+    $ git clone https://github.com/claudiorodr/Perlicasso
+    $ cd Perlicasso
     $ yarn install
 
 ## Configure app
