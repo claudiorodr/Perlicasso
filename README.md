@@ -1,6 +1,7 @@
-# Project Title
+# Perlicasso
 
-A nice project with a nice description
+What would happen if Picasso painted with perlin noise? This is the answer. We developed a Perlin noise algorithm for image generation and a Twitter bot that posts a generated image everyday.
+![alt text](https://github.com/claudiorodr/Perlicasso/blob/master/generatedMap.png)
 
 ---
 ## Requirements
