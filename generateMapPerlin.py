@@ -23,6 +23,26 @@ def triangleWave(x,period):
 def remapValues(x,origMin,origMax,newMin,newMax):
     return ((x-origMin)/(origMax-origMin))*(newMax-newMin)+newMin
 
+def genRandomColor():
+    return [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
+
+def genNRandomColors(n):
+    colors = [ [0,0,0] for i in range(n)]
+    
+    for i in range(n):
+        colors[i] = genRandomColor()
+    
+    return colors
+
+def interpolateColors(color1,color2,percent):
+    color = [0,0,0]
+
+    color[0] = math.floor((color2[0] - color1[0])*percent + color1[0])
+    color[1] = math.floor((color2[1] - color1[1])*percent + color1[1])
+    color[2] = math.floor((color2[2] - color1[2])*percent + color1[2])
+
+    return color
+    
 def genRandomVectors(numVectorsX,numVectorsY,vsize):
     vectorsX = [ [ 0 for i in range(numVectorsY) ] for j in range(numVectorsX) ] 
     vectorsY = [ [ 0 for i in range(numVectorsY) ] for j in range(numVectorsX) ] 
@@ -241,47 +261,78 @@ def distanceMap(width,height,pointX,pointY):
 
     return resultMap
 
+def genColorMapConnected(normalizedMap,numberColors,imageWidth,imageHeight):
+    colors = genNRandomColors(numberColors)
+
+    colorsMap = [ [ [0,0,0] for i in range(imageHeight) ] for j in range(imageWidth) ] 
+
+    for i in range(imageWidth):
+        for j in range(imageHeight):
+            heightValue = (numberColors-1)*normalizedResults[i][j]
+            for w in range(numberColors-1):
+                if(heightValue <= (w+1)):
+                    heightValue = heightValue - w
+                    colorsMap[i][j] = interpolateColors(colors[w],colors[w+1],heightValue)
+                    break
+
+    return colorsMap
+
+def genColorMapSeparated(normalizedMap,numberColors,imageWidth,imageHeight):
+    colors = genNRandomColors(numberColors)
+
+    colorsMap = [ [ [0,0,0] for i in range(imageHeight) ] for j in range(imageWidth) ] 
+
+    for i in range(imageWidth):
+        for j in range(imageHeight):
+            heightValue = (math.floor(numberColors/2))*normalizedResults[i][j]
+            for w in range(math.floor(numberColors/2)):
+                if(heightValue <= (w+1)):
+                    heightValue = heightValue - w
+                    colorsMap[i][j] = interpolateColors(colors[2*w],colors[2*w+1],heightValue)
+                    break
+
+    return colorsMap
+
 
 
 outputImageWidth = 1920
 outputImageHeight = 1080
-randomValue = random.randint(50,500)
-interVectorDistance = randomValue
-vectorSize = randomValue
 
-perlinMap1 = perlinMap(outputImageWidth,outputImageHeight,interVectorDistance,vectorSize)
-perlinMap2 = perlinMap(outputImageWidth,outputImageHeight,math.floor(interVectorDistance/3),math.floor(vectorSize/3))
-perlinMap2 = multiplyMap(outputImageWidth,outputImageHeight,perlinMap2,0.5)
-fullMap = addMaps(outputImageWidth,outputImageHeight,perlinMap1,perlinMap2)
+randomMap = random.randint(1,6)
 
-#normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,fullMap)
+if(randomMap == 1):
+    ivd = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    vsize = ivd
+    normalizedResults = perlinMap(outputImageWidth,outputImageHeight,ivd,vsize)
+elif(randomMap == 2):
+    ivd = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    normalizedResults = valueNoiseMap(outputImageWidth,outputImageHeight,100)
+elif(randomMap == 3):
+    freq = 1/(random.randint(5,100))
+    generated = cosinesMap(outputImageWidth,outputImageHeight,freq,freq)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+elif(randomMap == 4):
+    period = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    generated = sawtoothMap(outputImageWidth,outputImageHeight,period,period)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+elif(randomMap == 5):
+    period = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    generated = triangleMap(outputImageWidth,outputImageHeight,period,period)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+elif(randomMap == 6):
+    xpos = random.randint(0,outputImageWidth)
+    ypos = random.randint(0,outputImageHeight)
+    generated = distanceMap(outputImageWidth,outputImageHeight,xpos,ypos)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
 
-#valueNoise1 = valueNoiseMap(outputImageWidth,outputImageHeight,interVectorDistance)
-#valueNoise2 = valueNoiseMap(outputImageWidth,outputImageHeight,math.floor(interVectorDistance/3))
-#valueNoise2 = multiplyMap(outputImageWidth,outputImageHeight,valueNoise2,0.5)
-#fullMap = addMaps(outputImageWidth,outputImageHeight,valueNoise1,valueNoise2)
+numberColors = random.randint(2,10)
 
-normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,fullMap)
+paintingMethod = random.randint(1,2)
 
-redColors = [ [ 0 for i in range(outputImageHeight) ] for j in range(outputImageWidth) ] 
-greenColors = [ [ 0 for i in range(outputImageHeight) ] for j in range(outputImageWidth) ] 
-blueColors = [ [ 0 for i in range(outputImageHeight) ] for j in range(outputImageWidth) ] 
-
-for i in range(outputImageWidth):
-    for j in range(outputImageHeight):
-        value = math.ceil(255*normalizedResults[i][j])
-        if(value < 50):
-            redColors[i][j] = remapValues(value,0,50,120,255)
-        elif(value < 100):
-            redColors[i][j] = remapValues(value,50,100,120,255)
-            greenColors[i][j] = remapValues(value,50,100,120,255)
-        elif(value < 150):
-            greenColors[i][j] = remapValues(value,100,150,120,255)
-        elif(value < 200):
-            greenColors[i][j] = remapValues(value,150,200,120,255)
-            blueColors[i][j] = remapValues(value,150,200,120,255)
-        else:
-            blueColors[i][j] = remapValues(value,200,250,120,255)
+if(paintingMethod == 1):
+    colorsMap = genColorMapSeparated(normalizedResults,numberColors,outputImageWidth,outputImageHeight)
+elif(paintingMethod == 2):
+    colorsMap = genColorMapConnected(normalizedResults,numberColors,outputImageWidth,outputImageHeight)
 
 generatedMap = Image.new(mode = "RGB", size=(outputImageWidth,outputImageHeight))
 
@@ -289,6 +340,6 @@ pixels = generatedMap.load()
 
 for i in range(generatedMap.size[0]):
     for j in range(generatedMap.size[1]):
-        pixels[i,j] = (math.floor(redColors[i][j]/2),math.floor(greenColors[i][j]/2),math.floor(blueColors[i][j]/2))
+        pixels[i,j] = (colorsMap[i][j][0],colorsMap[i][j][1],colorsMap[i][j][2])
     
 generatedMap.save("generatedMap.png")
