@@ -27,9 +27,10 @@ def genRandomColor():
     return [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
 
 def genRandomColorFrom(color):
-    deltaR = random.randint(-100,100)
-    deltaG = deltaR+random.randint(-40,40)
-    deltaB = deltaR+random.randint(-40,40)
+    deltaValue = random.randint(-100,100)
+    deltaR = deltaValue+random.randint(-40,40)
+    deltaG = deltaValue+random.randint(-40,40)
+    deltaB = deltaValue+random.randint(-40,40)
 
     finalR = max(min(color[0]+deltaR,255),0)
     finalG = max(min(color[1]+deltaG,255),0)
