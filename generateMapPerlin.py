@@ -26,6 +26,17 @@ def remapValues(x,origMin,origMax,newMin,newMax):
 def genRandomColor():
     return [random.randint(0,255),random.randint(0,255),random.randint(0,255)]
 
+def genRandomColorFrom(color):
+    deltaR = random.randint(-100,100)
+    deltaG = deltaR+random.randint(-40,40)
+    deltaB = deltaR+random.randint(-40,40)
+
+    finalR = max(min(color[0]+deltaR,255),0)
+    finalG = max(min(color[1]+deltaG,255),0)
+    finalB = max(min(color[2]+deltaB,255),0)
+
+    return[finalR,finalG,finalB]
+
 def genNRandomColors(n):
     colors = [ [0,0,0] for i in range(n)]
     
@@ -33,6 +44,17 @@ def genNRandomColors(n):
         colors[i] = genRandomColor()
     
     return colors
+
+def genNRandomSimilarColors(n):
+    colors = [ [0,0,0] for i in range(n)]
+
+    colors[0] = genRandomColor()
+
+    for i in range(n-1):
+        colors[i+1] = genRandomColorFrom(colors[i])
+
+    return colors
+
 
 def interpolateColors(color1,color2,percent):
     color = [0,0,0]
@@ -261,8 +283,26 @@ def distanceMap(width,height,pointX,pointY):
 
     return resultMap
 
-def genColorMapConnected(normalizedMap,numberColors,imageWidth,imageHeight):
-    colors = genNRandomColors(numberColors)
+def distanceCosMap(width,height,pointX,pointY,freq):
+    resultMap = [ [ 0 for i in range(height) ] for j in range(width) ] 
+
+    for i in range(width):
+        for j in range(height):
+            resultMap[i][j] = math.cos(freq*math.sqrt((i-pointX)*(i-pointX) + (j-pointY)*(j-pointY)))
+
+    return resultMap
+
+def distanceTriangleMap(width,height,pointX,pointY,period):
+    resultMap = [ [ 0 for i in range(height) ] for j in range(width) ] 
+
+    for i in range(width):
+        for j in range(height):
+            resultMap[i][j] = triangleWave(math.sqrt((i-pointX)*(i-pointX) + (j-pointY)*(j-pointY)),period)
+
+    return resultMap
+
+def genColorMapConnected(normalizedMap,numberColors,imageWidth,imageHeight,colorsGenerator):
+    colors = colorsGenerator(numberColors)
 
     colorsMap = [ [ [0,0,0] for i in range(imageHeight) ] for j in range(imageWidth) ] 
 
@@ -277,8 +317,8 @@ def genColorMapConnected(normalizedMap,numberColors,imageWidth,imageHeight):
 
     return colorsMap
 
-def genColorMapSeparated(normalizedMap,numberColors,imageWidth,imageHeight):
-    colors = genNRandomColors(numberColors)
+def genColorMapSeparated(normalizedMap,numberColors,imageWidth,imageHeight,colorsGenerator):
+    colors = colorsGenerator(numberColors)
 
     colorsMap = [ [ [0,0,0] for i in range(imageHeight) ] for j in range(imageWidth) ] 
 
@@ -298,41 +338,66 @@ def genColorMapSeparated(normalizedMap,numberColors,imageWidth,imageHeight):
 outputImageWidth = 1920
 outputImageHeight = 1080
 
-randomMap = random.randint(1,6)
+randomMap = random.randint(1,100)
 
-if(randomMap == 1):
-    ivd = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+if(randomMap >= 1 and randomMap <= 35):
+    ivd = random.randint(math.floor(outputImageWidth/40),math.floor(outputImageWidth/4))
     vsize = ivd
     normalizedResults = perlinMap(outputImageWidth,outputImageHeight,ivd,vsize)
-elif(randomMap == 2):
-    ivd = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    numberColors = random.randint(6,12)
+elif(randomMap >= 36 and randomMap <= 65):
+    ivd = random.randint(math.floor(outputImageWidth/40),math.floor(outputImageWidth/4))
     normalizedResults = valueNoiseMap(outputImageWidth,outputImageHeight,100)
-elif(randomMap == 3):
-    freq = 1/(random.randint(5,100))
+    numberColors = random.randint(6,12)
+elif(randomMap >= 92 and randomMap <= 97):
+    freq = 1/(random.randint(10,100))
     generated = cosinesMap(outputImageWidth,outputImageHeight,freq,freq)
     normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
-elif(randomMap == 4):
-    period = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    numberColors = random.randint(4,8)
+elif(randomMap >= 100 and randomMap <= 100):
+    period = random.randint(math.floor(outputImageWidth/40),math.floor(outputImageWidth/4))
     generated = sawtoothMap(outputImageWidth,outputImageHeight,period,period)
     normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
-elif(randomMap == 5):
-    period = random.randint(math.floor(outputImageWidth/20),math.floor(outputImageWidth/2))
+    numberColors = random.randint(4,8)
+elif(randomMap >= 98 and randomMap <= 99):
+    period = random.randint(math.floor(outputImageWidth/40),math.floor(outputImageWidth/4))
     generated = triangleMap(outputImageWidth,outputImageHeight,period,period)
     normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
-elif(randomMap == 6):
+    numberColors = random.randint(4,8)
+elif(randomMap >= 86 and randomMap <= 91):
     xpos = random.randint(0,outputImageWidth)
     ypos = random.randint(0,outputImageHeight)
     generated = distanceMap(outputImageWidth,outputImageHeight,xpos,ypos)
     normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+    numberColors = random.randint(6,12)
+elif(randomMap >= 66 and randomMap <= 75):
+    xpos = random.randint(0,outputImageWidth)
+    ypos = random.randint(0,outputImageHeight)
+    freq = 1/(random.randint(5,100))
+    generated = distanceCosMap(outputImageWidth,outputImageHeight,xpos,ypos,freq)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+    numberColors = random.randint(4,8)
+elif(randomMap >= 76 and randomMap <= 85):
+    xpos = random.randint(0,outputImageWidth)
+    ypos = random.randint(0,outputImageHeight)
+    period = random.randint(math.floor(outputImageWidth/40),math.floor(outputImageWidth/4))
+    generated = distanceTriangleMap(outputImageWidth,outputImageHeight,xpos,ypos,period)
+    normalizedResults = normalizeMap(outputImageWidth,outputImageHeight,generated)
+    numberColors = random.randint(4,8)
 
-numberColors = random.randint(2,10)
 
 paintingMethod = random.randint(1,2)
+colorsGeneratorN = random.randint(1,20)
+
+if(colorsGeneratorN == 1):
+    colorsGenerator = genNRandomColors
+else:
+    colorsGenerator = genNRandomSimilarColors
 
 if(paintingMethod == 1):
-    colorsMap = genColorMapSeparated(normalizedResults,numberColors,outputImageWidth,outputImageHeight)
+    colorsMap = genColorMapSeparated(normalizedResults,numberColors,outputImageWidth,outputImageHeight,colorsGenerator)
 elif(paintingMethod == 2):
-    colorsMap = genColorMapConnected(normalizedResults,numberColors,outputImageWidth,outputImageHeight)
+    colorsMap = genColorMapConnected(normalizedResults,numberColors,outputImageWidth,outputImageHeight,colorsGenerator)
 
 generatedMap = Image.new(mode = "RGB", size=(outputImageWidth,outputImageHeight))
 
