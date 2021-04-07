@@ -68,7 +68,7 @@ Open `a/nice/path/to/a.file` then edit it with your settings. You will need:
 
     $ yarn build
 
-## Author
+## Authors
 👤 Arturo Alves
 
 - Github: [@SvelaT](https://github.com/SvelaT)
